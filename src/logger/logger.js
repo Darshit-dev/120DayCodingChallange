@@ -1,5 +1,5 @@
 let welcome =function(){
-    console.log("Welcome")
+    console.log("Welcome to my application. I am Darshit and a part of FunctionUp Urenium cohort.")
 
 }
 
