@@ -32,18 +32,27 @@ let players =
 
 let manipulation = function (req, res) {
     let data = req.body
-    console.log(data)
+    console.log(data.name)
     
+    let flag=0;
 
     players.map((item)=>{
         if(item.name === data.name ){
-            return res.status(404).send("player name is already exist!")
+            
+            flag =1
+            
         }
-
+        
     })
+    if(flag === 1){
+        return res.send("player name is already exist!")
+    }
+    else {
+    
     players.push(data)
-
-    res.send({ msg: "hi guys", newPlayer : players })
+    }
+    console.log(players)
+    return res.send( { NewPlayers :players })
     
 }
 

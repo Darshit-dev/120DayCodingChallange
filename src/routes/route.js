@@ -1,5 +1,7 @@
 const express = require('express');
 const playerArr = require('../controllers/assignment');
+
+
 const router = express.Router();
 
 
@@ -25,7 +27,6 @@ router.post('/players', playerArr.manipulation);   // to send data in  post requ
 
 router.get('/test-me', function (req, res) {
     // let a = { msg: "My first ever API response in JSON !!"} 
-
 
     res.send({ msg: "My first ever API response in JSON !!" })
 });
@@ -63,12 +64,12 @@ router.get('/test-api5', function (req, res) {
 
 
 
-router.get('/test-api6', function (req, res) {
-
+router.post('/test-api6', function (req, res) {
+    let a = req.body
     res.send({ data: [12, 24, 36, 48, 60] })
 });
 
-router.post('/playersadfad',);
+
 
 
 
