@@ -21,14 +21,14 @@ const bookbyChetanBhagat = async function(req, res){
     // const getAuthorIdTemp = showAuthor.map(data => data.author_id);
     // const getAuthorID = getAuthorIdTemp[0];
     const getAuthorID = showAuthor.author_id;
-
+    
     const allBooks = await BookModel.find({ author_id: getAuthorID }).select({ bookName: 1, _id: 0 });
     res.send( { data: allBooks } );
 }
 
 const findandUpdateTwoStates = async function(req, res){
     const findUpdate = await BookModel.findOneAndUpdate(
-        { bookName: "Two states" }, //condition 
+        { bookName: "Two States" }, //condition 
         { $set: { price: 100 } },
         { new: true }
     )
