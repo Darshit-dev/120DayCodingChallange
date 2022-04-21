@@ -1,12 +1,18 @@
 
 
-const mid4= function ( req, res, next) {
-    console.log("Hi I am a middleware named Mid4")
-    //counter
-    next()
-}
+const userMid= function ( req, res, next) {
+    console.log("Hi I am a middleware named Mid")
+    let  available = req.headers?.isfreeappuser
+    if(!available){
+        res.send("please Enter Header first")
+    }else{
+        if(available === "true")
+        req['isFreeAppUser'] = true
+        if(available === "false")
+        req['isFreeAppUser'] = false
+        next()
+    }
+    }
 
-module.exports.mid1= mid1
-module.exports.mid2= mid2
-module.exports.mid3= mid3
-module.exports.mid4= mid4
+
+module.exports.userMid= userMid

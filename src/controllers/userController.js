@@ -1,3 +1,4 @@
+// @ts-check
 const req = require("express/lib/request")
 const UserModel= require("../models/userModel")
 
