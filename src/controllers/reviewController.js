@@ -24,15 +24,16 @@ const addReview = async function (req, res) {
         .status(400)
         .send({ status: false, message: "Please Enter data to create review" });
     }
+
     //validation
     if (!isvalidObjectId(bookId)) {
       return res
         .status(403)
         .send({ status: false }, { message: "Invalid bookId" });
     }
+    
     const isBookAvalilable = await bookModel
       .findOne({ _id: bookId, isDeleted: false })
-      .lean();
     if (!isBookAvalilable) {
       return res.status(404).send({ message: "Book is not available" });
     }
@@ -87,7 +88,7 @@ const updateReview = async function (req, res) {
         .status(400)
         .send({ status: false, message: "Please Enter Data" });
     }
-    const { reviwes, rating, reviewedBy } = getBodyData;
+    const { review, rating, reviewedBy } = getBodyData;
     
       if (!Number.isInteger(rating)) {
         //if(!isValid(rating)){return res.status(400).send({ message:"please enter rating first"})}
@@ -116,7 +117,7 @@ const updateReview = async function (req, res) {
 
     const updatedReview = await reviewModel.findOneAndUpdate(
       { _id: getreviewId, isDeleted: false },
-      { $set: { reviews: review, rating: rating, reviewedBy: reviewedBy } },
+      { $set: { review: review, rating: rating, reviewedBy: reviewedBy } },
       { new: true }
     );
     console.log(updatedReview);

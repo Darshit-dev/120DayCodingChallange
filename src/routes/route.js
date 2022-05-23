@@ -1,10 +1,16 @@
 const express = require('express');
-
+const aws= require("aws-sdk")
 const router = express.Router();
 const userController = require('../controllers/userController')
 const bookController = require('../controllers/bookController')
 const reviewController = require('../controllers/reviewController')
 const {authorization,authentication} = require('../middleware/auth')
+
+
+
+
+
+
 //user api
 router.post('/register',userController.registerUser)
 router.post('/login',userController.loginUser)
@@ -12,7 +18,7 @@ router.post('/login',userController.loginUser)
 
 //books api
 
- router.post('/book',authentication,authorization,bookController.createBook)
+ router.post('/books',bookController.createBook)
  router.get('/books',bookController.getBooks)
  router.get('/books/:bookId',bookController.getBooksDataById)
  router.put('/books/:bookId',authentication,authorization,bookController.updateBook)
@@ -21,7 +27,7 @@ router.post('/login',userController.loginUser)
 //Review Api
 router.post('/books/:bookId/review',reviewController.addReview)
 router.put('/books/:bookId/review/:reviewId',reviewController.updateReview)
- router.delete('/books/:bookId/review/:reviewId',authentication,authorization,reviewController.deleteReview)
+ router.delete('/books/:bookId/review/:reviewId',reviewController.deleteReview)
 
 
 

@@ -73,7 +73,6 @@ const registerUser = async function (req, res) {
         .send({ status: false, message: "Email should be valid" });
     }
 
-    //!TO DO:to trim all the value, to do validation of empty string
     if (!password) {
       return res
         .status(400)

@@ -2,7 +2,7 @@
 const bookModel = require("../models/bookModel");
 const reviewModel = require("../models/reviewModel");
 const mongoose = require("mongoose");
-
+const aws = require("aws-sdk")
 const isValid = function (value) {
   if (typeof value === "undefined" || value === null) return false;
   if (typeof value === "string" && value.trim().length === 0) return false;
@@ -12,9 +12,49 @@ const isValidObjectId = function(objectId) {
   return mongoose.Types.ObjectId.isValid(objectId);
 };
 
+
+aws.config.update({
+  accessKeyId: "AKIAY3L35MCRUJ6WPO6J",
+secretAccessKey: "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",
+  region: "ap-south-1"
+})
+
+
+///aws 
+let uploadFile= async ( file) =>{
+   return new Promise( function(resolve, reject) {
+    // this function will upload file to aws and return the link
+    let s3= new aws.S3({apiVersion: '2006-03-01'}); // we will be using the s3 service of aws
+
+    var uploadParams= {
+        ACL: "public-read",
+        Bucket: "classroom-training-bucket",  //HERE
+        Key: "abc/" + file.originalname, //HERE 
+        Body: file.buffer
+    }
+
+
+    s3.upload( uploadParams, function (err, data ){
+        if(err) {
+            return reject({"error": err})
+        }
+        console.log(data)
+        console.log("file uploaded succesfully")
+        return resolve(data.Location)
+    })
+
+   })
+}
+
+
+
+
+
+
+
 const createBook = async function (req, res) {
   try {
-    const getBodyData = req.body;
+    let  getBodyData = req.body;
     const {
       title,
       excerpt,
@@ -25,70 +65,86 @@ const createBook = async function (req, res) {
       releasedAt,
     } = getBodyData;
 
+    //aws
+    let files= req.files
+        if(files && files.length>0){
+           
+            let uploadedFileURL= await uploadFile( files[0] )
+
+            getBodyData.bookCover = uploadedFileURL
+            
+        }
+        else{
+            res.status(400).send({ msg: "No file found" })
+        }
+
+
+
     if (Object.keys(getBodyData).length == 0) {
       return res
         .status(400)
         .send({ status: false, message: "Please Enter Data" });
     }
 
-    if (!isValid(title)) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Enter Title" });
-    }
 
-    const checkTitle = await bookModel.findOne({ title: title });
-    if (checkTitle)
-      return res
-        .status(400)
-        .send({ status: false, message: "Please enter unique title" });
-    //!add to check duplicate value
-    if (!isValid(excerpt)) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Enter excerpt" });
-    }
+    // if (!isValid(title)) {
+    //   return res
+    //     .status(400)
+    //     .send({ status: false, message: "Please Enter Title" });
+    // }
+
+    // const checkTitle = await bookModel.findOne({ title: title });
+    // if (checkTitle)
+    //   return res
+    //     .status(400)
+    //     .send({ status: false, message: "Please enter unique title" });
 
     
-    if (!isValidObjectId(userId)) {
-      return res.status(400).send({ status: false, message: "Invalid userId" });
-    }
+    // if (!isValid(excerpt)) {
+    //   return res
+    //     .status(400)
+    //     .send({ status: false, message: "Please Enter excerpt" });
+    // }
 
-    if (!isValid(ISBN)) {
-      return res
-      .status(400)
-      .send({ status: false, message: "Please Enter ISBN" });
-    }
-    if(!/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/.test(ISBN)){return res.status(400).send({ status: false, message:"Please Enter valid ISBN number"})}
+    
+    // if (!isValidObjectId(userId)) {
+    //   return res.status(400).send({ status: false, message: "Invalid userId" });
+    // }
 
-    //ISBN uplicate or not
-    const checkISBN = await bookModel.findOne({ ISBN: ISBN });
-    if (checkISBN)
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Enter unique ISBN" });
+    // if (!isValid(ISBN)) {
+    //   return res
+    //   .status(400)
+    //   .send({ status: false, message: "Please Enter ISBN" });
+    // }
+    // if(!/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/.test(ISBN)){return res.status(400).send({ status: false, message:"Please Enter valid ISBN number"})}
+
+    // //ISBN uplicate or not
+    // const checkISBN = await bookModel.findOne({ ISBN: ISBN });
+    // if (checkISBN)
+    //   return res
+    //     .status(400)
+    //     .send({ status: false, message: "Please Enter unique ISBN" });
 
     //if category is not specified
-    if (!isValid(category)) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Enter category" });
-    }
+    // if (!isValid(category)) {
+    //   return res
+    //     .status(400)
+    //     .send({ status: false, message: "Please Enter category" });
+    // }
 
-    if (!isValid(subcategory)) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Enter subcategory" });
-    }
+    // if (!isValid(subcategory)) {
+    //   return res
+    //     .status(400)
+    //     .send({ status: false, message: "Please Enter subcategory" });
+    // }
 
-    //can we skip this portion
     // if (req.body.hasOwnProperty("isDeleted")) {
     //   if (req.body.isDeleted == true) {
     //     req.body.deletedAt = Date.now();
     //   }
     // }
 
-    if(!isValid(releasedAt)){return res.status(400).send({status:false, message:"Please Enter a released date"})}
+    //if(!isValid(releasedAt)){return res.status(400).send({status:false, message:"Please Enter a released date"})}
    
     if (!releasedAt.match(/^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/))
       return res.status(400).send({
@@ -96,7 +152,7 @@ const createBook = async function (req, res) {
         message: "Released date format should be in 'yyyy-mm-dd' format",
       });
 
-    const createBook = await bookModel.create(req.body);
+    var createBook = await bookModel.create(req.body);
     return res
       .status(200)
       .send({ status: true, message: "Success", data: createBook });
@@ -197,6 +253,7 @@ const updateBook = async function (req, res) {
   try {
     let getBookId = req.params.bookId;
     let getBody = req.body;
+    
     
     if(!isValidObjectId(getBookId)) {return res.status(401).send({ status:false, message:"Invalid Obejct Id"})}
     if(Object.keys(getBody).length == 0){ return res.status(400).send({ status: false, message: "Please enter body to update" }); }

@@ -35,12 +35,12 @@ const authorization = async function (req, res, next) {
         const decodedToken = await jwt.verify(token, "Project3")
         let isUserId;
         
-        if(req.body.hasOwnProperty("userId")){
+        if(req.body.userId in req.body){
             if(!isValidObjectId(req.body.userId)) {return res.status(400).send({ status:false, message:"Invalid Obejct Id"})}
             isUserId = req.body.userId
         }
 
-        if(req.params.hasOwnProperty("bookId")){
+        if(req.params.bookId in req.params){
             if(!isValidObjectId(req.params.bookId)) {return res.status(400).send({ status:false, message:"Invalid Obejct Id"})}
             let getUserId = await bookModel.findById(req.params.bookId)
             if(!getUserId) {return res.status(400).send({ status:false, message:"Books not found"})}

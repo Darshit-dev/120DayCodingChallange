@@ -15,7 +15,10 @@ const bookSchema = new mongoose.Schema({
     deletedAt :{type:Date,default:null},
     isDeleted : {type:Boolean,default:false},
     releasedAt:{type : String,required : true},
-    deletedAt : {type:Date,default:null}
+    deletedAt : {type:Date,default:null},
+    bookCover : {type:String}
+   
+
 },{timestamps:true})
 
 module.exports = mongoose.model('Books',bookSchema)
